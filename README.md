@@ -1,0 +1,2 @@
+# DukeOpenAIHack
+Duke OpenAI Hackathon
