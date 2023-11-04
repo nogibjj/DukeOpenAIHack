@@ -1,6 +1,24 @@
 # DUKE GENERATIVE AI HACKATHON
 # NBA Live Commentary Generator with GPT-4.0
 
+## Table of Contents
+
+
+---------- OPTIONAL -------------
+- [Demo](#demo)   - need to add a video or smth
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+  - [API Integration](#api-integration)
+  - [Running the Commentary Generator](#running-the-commentary-generator)
+- [Contributing](#contributing)
+- [License](#license)
+
+
+
+
+
 ## Overview
 
 In the era of data-driven sports analysis and immersive fan experiences, our project aims to create an innovative solution that combines play-by-play data from the SportsRadar API and NBA API with the advanced language generation capabilities of GPT-4.0 from OpenAI. This collaboration results in a live commentary generator for NBA games that goes beyond traditional commentary by offering real-time insights and engagement with fans.
