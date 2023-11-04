@@ -6,6 +6,7 @@
 
 ---------- OPTIONAL -------------
 - [Demo](#demo)   - need to add a video or smth
+- [Overview](#Overview)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
