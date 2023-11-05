@@ -53,7 +53,7 @@ def generate_game_intro(db):
             },
             {
                 "role": "user",
-                "content": "Generate an NBA game opener that a commentator would say",
+                "content": "Generate an very brief NBA game opener that a commentator would say in two to three sentences.",
             },
         ],
         temperature=1,  # Adjust temperature as needed
@@ -103,7 +103,7 @@ def generate_commentary(curr_gameplay, curr_context):
         messages=[
             {
                 "role": "system",
-                "content": f"You are a sports commentator narrating an NBA game event by event. Given this {curr_context} for this game, generate commentary for the game at a point of this {curr_gameplay}. Address this in the present tense as live commentary for a game that is happening.Make it very brief and excited",
+                "content": f"You are a sports commentator narrating an NBA game event by event. Given this {curr_context} for this game, generate very brief commentary for the game at a point of this {curr_gameplay}. Address this in the present tense as live commentary for a game that is happening.Make it very brief and excited. Dont start the sentence with 'and' and dont say what time of the game it is. Make the responses two to three sentences long.",
             }
         ],
         temperature=0.93,
@@ -138,7 +138,7 @@ def main():
         output_file.write(f"{intro}")
 
     n = 2
-    while n < 6:
+    while n < 5:
         event = data[n]
         curr_event = current_game_event(event)
 

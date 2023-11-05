@@ -12,6 +12,24 @@ import winsound
 audio_queue = queue.Queue()
 
 
+# def text_to_speech(text, filename):
+#     client = texttospeech.TextToSpeechClient()
+
+#     input_text = texttospeech.SynthesisInput(text=text)
+
+#     voice = texttospeech.VoiceSelectionParams(
+#         language_code="en-US",
+#         ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
+#     )
+
+#     audio_config = texttospeech.AudioConfig(
+#         audio_encoding=texttospeech.AudioEncoding.MP3
+#     )
+
+#     response = client.synthesize_speech(
+#         request={"input": input_text, "voice": voice, "audio_config": audio_config}
+#     )
+
 def text_to_speech(text, filename):
     client = texttospeech.TextToSpeechClient()
 
@@ -19,11 +37,14 @@ def text_to_speech(text, filename):
 
     voice = texttospeech.VoiceSelectionParams(
         language_code="en-US",
-        ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
+        name="en-US-Polyglot-1",
     )
 
+
     audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        pitch=-4.4,
+        speaking_rate=1.27,
     )
 
     response = client.synthesize_speech(
@@ -62,7 +83,7 @@ def play_audios():
             os.remove(audio_file)  # Delete the .mp3 file after playing it
             os.remove(wav_file)  # Delete the .wav file after playing it
         else:
-            time.sleep(1)  # Wait for 1 second if the queue is empty
+            time.sleep(2)  # Wait for 1 second if the queue is empty
 
 
 # Create an observer and register the handler
