@@ -7,6 +7,7 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 import json
 import openai
+import time
 
 # read openai api
 with open("../api_keys.json", 'r') as config_file:
@@ -21,14 +22,14 @@ embeddings = OpenAIEmbeddings(openai_api_key=api_key)
 # Load pregame information and add it to FAISS
 loader = TextLoader("../data/pregame.txt")
 documents = loader.load()
-text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 main_db = FAISS.from_documents(docs, embeddings)
 
 # Load additional game information and add it to FAISS
 loader = TextLoader("../data/game_info.txt")
 documents = loader.load()
-text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 intro_db = FAISS.from_documents(docs, embeddings)
 
@@ -52,7 +53,7 @@ def generate_game_intro(db):
             }
         ],
         temperature=1,  # Adjust temperature as needed
-        max_tokens=256  # Adjust max_tokens as needed
+        max_tokens=100  # Adjust max_tokens as needed
     )
 
     game_intro = prompt.choices[0].message["content"]
@@ -66,26 +67,29 @@ def get_current_game_play():
             game_play_data = json.loads(line)
             return game_play_data
 
+""" 
 def current_game_event(curr_event):
     event_description = openai.ChatCompletion.create(
-                                                    model="gpt-3.5-turbo",
+                                                    model="gpt-4",
                                                     messages=[
                                                         {
                                                         "role": "system",
-                                                        "content": "describe this as an event happening"
-                                                        },
-                                                        {
-                                                        "role": "user",
-                                                        "content": f"{curr_event}"
+                                                        "content": f"For an NBA basketball game, generate a text description for this event {curr_event}."
                                                         }
                                                     ],
-                                                    temperature=1,
-                                                    max_tokens=256,
+                                                    temperature=0.98,
+                                                    max_tokens=100,
                                                     top_p=1,
-                                                    frequency_penalty=0,
+                                                    frequency_penalty=0.5,
                                                     presence_penalty=0,
                                                     )
     return event_description["choices"][0]["message"]["content"]
+
+"""
+
+def current_game_event(curr_event):
+    event_description = f"It's the {curr_event['quarter']} quarter, {curr_event['clock']} minutes on the clock, {curr_event['description']}, the event here is a {curr_event['event_type']}, the home team has {curr_event['home_points']} points, and the away team has {curr_event['away_points']} points."
+    return event_description
 
 # Function to retrieve the last n responses from the vector store
 def get_context_from_vector_store(curr_game_play_data):
@@ -100,21 +104,17 @@ def generate_commentary(curr_gameplay, curr_context):
     curr_context = get_context_from_vector_store(curr_gameplay)
 
     curr_response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
-                "content": f"You are a sports commentator narrating an NBA game event by event. Given this {curr_context} for this game, generate commentary for the game"
-            },
-            {
-                "role": "user",
-                "content": curr_gameplay
+                "content": f"You are a sports commentator narrating an NBA game event by event. Given this {curr_context} for this game, generate commentary for the game at a point of this {curr_gameplay}. Address this in the present tense as live commentary for a game that is happening.Make it very brief and excited"
             }
         ],
         temperature=0.93,
-        max_tokens=512,
+        max_tokens=100,
         top_p=1,
-        frequency_penalty=0,
+        frequency_penalty=0.2,
         presence_penalty=0
     )
     return curr_response["choices"][0]["message"]["content"]
@@ -122,8 +122,8 @@ def generate_commentary(curr_gameplay, curr_context):
 def add_to_vector_store(response):
     splitter = CharacterTextSplitter(
         separator="\n", # Split the text by new line
-        chunk_size=100, # Split the text into chunks of 1000 characters
-        chunk_overlap=5, # Overlap the chunks by 200 characters
+        chunk_size=1000, # Split the text into chunks of 1000 characters
+        chunk_overlap=50, # Overlap the chunks by 200 characters
         length_function=len # Use the length function to get the length of the text
     )
     # Get the chunks of text
@@ -136,31 +136,30 @@ def add_to_vector_store(response):
 def main():
     data = get_current_game_play()
 
-    n = 1
-    while n < 5:
+    intro = generate_game_intro(intro_db)
+    with open("../data/output.txt", "a") as output_file:
+        output_file.write(f"{intro}")
 
-        print("#"*100)
-        print(generate_game_intro(intro_db))
-        print("#"*100)
+    n = 2
+    while n < 20:
 
         event = data[n]
+        start =time.time()
         curr_event = current_game_event(event)
-        print(f"Current event: {curr_event}")
-        print("*"*100)
 
         context = get_context_from_vector_store(curr_event)
-        print(f"Context: {context}")
         curr_commentary = generate_commentary(curr_event, context)
-
+        stop =time.time()
         #add it to vector store 
         add_to_vector_store(curr_commentary)
 
         #print (new_commentary)
-        print(f"Commentary: {curr_commentary}")
-        print("#"*100)
+        with open("../data/output.txt", "a") as output_file:
+            output_file.write(f"{curr_commentary}\n")
         
         #average lag time
         n +=1
+        print(n, stop-start)
     return None
 
 if __name__ == "__main__":
