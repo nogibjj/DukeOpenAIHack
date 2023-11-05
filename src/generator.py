@@ -2,9 +2,12 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.document_loaders import TextLoader
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema.output_parser import StrOutputParser
+from langchain.schema.runnable import RunnablePassthrough
 import json
 import openai
-from time import sleep
+import time
 
 # read openai api
 with open("../api_keys.json", 'r') as config_file:
@@ -16,15 +19,47 @@ openai.api_key = api_key
 # Initialize the OpenAIEmbeddings instance
 embeddings = OpenAIEmbeddings(openai_api_key=api_key)
 
-#load pregame information and add it to FAISS db
+# Load pregame information and add it to FAISS
 loader = TextLoader("../data/pregame.txt")
 documents = loader.load()
-text_splitter = CharacterTextSplitter(chunk_size=100, chunk_overlap=5)
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
+main_db = FAISS.from_documents(docs, embeddings)
 
-db = FAISS.from_documents(docs, embeddings)
+# Load additional game information and add it to FAISS
+loader = TextLoader("../data/game_info.txt")
+documents = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+docs = text_splitter.split_documents(documents)
+intro_db = FAISS.from_documents(docs, embeddings)
 
+# Combine the two databases into a single database
+main_db.merge_from(intro_db)
+retriever = intro_db.as_retriever()
 
+def generate_game_intro(db):
+    retriever = db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .8, "k": 10})
+
+    prompt = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": f"You are a commentator at an NBA match, answer the question based only on the following context:{retriever}"
+            },
+            {
+                "role": "user",
+                "content": "Generate an NBA game opener that a commentator would say"
+            }
+        ],
+        temperature=1,  # Adjust temperature as needed
+        max_tokens=100  # Adjust max_tokens as needed
+    )
+
+    game_intro = prompt.choices[0].message["content"]
+    return game_intro
+
+#print(generate_game_intro(intro_db))
 #get current line in game play json 
 def get_current_game_play():
     with open("../data/play_by_play.json", "r") as data_file:
@@ -33,31 +68,15 @@ def get_current_game_play():
             return game_play_data
 
 def current_game_event(curr_event):
-    event_description = openai.ChatCompletion.create(
-                                                    model="gpt-3.5-turbo",
-                                                    messages=[
-                                                        {
-                                                        "role": "system",
-                                                        "content": "describe this as an event happening"
-                                                        },
-                                                        {
-                                                        "role": "user",
-                                                        "content": f"{curr_event}"
-                                                        }
-                                                    ],
-                                                    temperature=1,
-                                                    max_tokens=256,
-                                                    top_p=1,
-                                                    frequency_penalty=0,
-                                                    presence_penalty=0,
-                                                    )
-    return event_description["choices"][0]["message"]["content"]
+    event_description = f"It's the {curr_event['quarter']} quarter, {curr_event['clock']} minutes on the clock, {curr_event['description']}, the event here is a {curr_event['event_type']}, the home team has {curr_event['home_points']} points, and the away team has {curr_event['away_points']} points."
+    return event_description
 
 # Function to retrieve the last n responses from the vector store
 def get_context_from_vector_store(curr_game_play_data):
     # Get the last n responses from the vector store
-    context = db.similarity_search(curr_game_play_data)
+    context = main_db.similarity_search(curr_game_play_data)
     return context
+
 
 def generate_commentary(curr_gameplay, curr_context):
 
@@ -65,21 +84,17 @@ def generate_commentary(curr_gameplay, curr_context):
     curr_context = get_context_from_vector_store(curr_gameplay)
 
     curr_response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
-                "content": f"You are a sports commentator narrating an NBA game event by event. Given this {curr_context} for this game, generate commentary for the game"
-            },
-            {
-                "role": "user",
-                "content": curr_gameplay
+                "content": f"You are a sports commentator narrating an NBA game event by event. Given this {curr_context} for this game, generate commentary for the game at a point of this {curr_gameplay}. Address this in the present tense as live commentary for a game that is happening.Make it very brief and excited"
             }
         ],
         temperature=0.93,
-        max_tokens=512,
+        max_tokens=100,
         top_p=1,
-        frequency_penalty=0,
+        frequency_penalty=0.2,
         presence_penalty=0
     )
     return curr_response["choices"][0]["message"]["content"]
@@ -87,40 +102,45 @@ def generate_commentary(curr_gameplay, curr_context):
 def add_to_vector_store(response):
     splitter = CharacterTextSplitter(
         separator="\n", # Split the text by new line
-        chunk_size=100, # Split the text into chunks of 1000 characters
-        chunk_overlap=5, # Overlap the chunks by 200 characters
+        chunk_size=1000, # Split the text into chunks of 1000 characters
+        chunk_overlap=50, # Overlap the chunks by 200 characters
         length_function=len # Use the length function to get the length of the text
     )
     # Get the chunks of text
     chunks = splitter.split_text(response)
 
     #add to vector store
-    db.add_texts(texts = chunks,embeddings= embeddings )
+    main_db.add_texts(texts = chunks,embeddings= embeddings )
     return None
 
 def main():
     data = get_current_game_play()
 
-    n = 1
-    while n < 10:
+    intro = generate_game_intro(intro_db)
+    with open("../data/output.txt", "a") as output_file:
+        output_file.write(f"{intro}")
+
+    n = 2
+    while n < 20:
+
         event = data[n]
+        start =time.time()
         curr_event = current_game_event(event)
-        print(curr_event)
-        print("*"*100)
 
         context = get_context_from_vector_store(curr_event)
         curr_commentary = generate_commentary(curr_event, context)
-
+        stop =time.time()
         #add it to vector store 
         add_to_vector_store(curr_commentary)
 
         #print (new_commentary)
-        print(curr_commentary)
-        print("#"*100)
+        with open("../data/output.txt", "a") as output_file:
+            output_file.write(f"{curr_commentary}\n")
+        
         #average lag time
-        sleep(5)
         n +=1
     return None
 
 if __name__ == "__main__":
     main()
+
