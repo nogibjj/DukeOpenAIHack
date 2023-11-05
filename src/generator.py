@@ -27,7 +27,7 @@ docs = text_splitter.split_documents(documents)
 main_db = FAISS.from_documents(docs, embeddings)
 
 # Load additional game information and add it to FAISS
-loader = TextLoader("../data/game_info.txt")
+loader = TextLoader("../data/game_info.txt", encoding="utf-8")
 documents = loader.load()
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
@@ -78,11 +78,8 @@ def get_current_game_play():
         for line in data_file:
             line = line.strip()  # Remove leading/trailing whitespace
             if line:  # Skip empty lines
-                try:
-                    game_play_data = json.loads(line)
-                    return game_play_data
-                except json.JSONDecodeError:
-                    continue  # Skip lines that are not valid JSON
+                game_play_data = json.loads(line)
+                return game_play_data
 
 
 def current_game_event(curr_event):
@@ -102,7 +99,7 @@ def generate_commentary(curr_gameplay, curr_context):
     curr_context = get_context_from_vector_store(curr_gameplay)
 
     curr_response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
             {
                 "role": "system",
@@ -112,7 +109,7 @@ def generate_commentary(curr_gameplay, curr_context):
         temperature=0.93,
         max_tokens=100,
         top_p=1,
-        frequency_penalty=0.2,
+        frequency_penalty=1.0,
         presence_penalty=0,
     )
     return curr_response["choices"][0]["message"]["content"]
@@ -141,7 +138,7 @@ def main():
         output_file.write(f"{intro}")
 
     n = 2
-    while n < 5:
+    while n < 6:
         event = data[n]
         curr_event = current_game_event(event)
 
@@ -150,12 +147,14 @@ def main():
 
         # add it to vector store
         add_to_vector_store(curr_commentary)
-
+        print(curr_commentary)
         # print (new_commentary)
         with open("commentary.txt", "a") as output_file:
             output_file.write(f"{curr_commentary}\n")
 
+
         # average lag time
+        print(n)
         n += 1
     return None
 

@@ -39,8 +39,8 @@ class TextFileChangeHandler(FileSystemEventHandler):
         self.last_text = ""
 
     def on_modified(self, event):
-        if not event.is_directory and event.src_path.endswith("commentary.txt"):
-            with open("commentary.txt", "r") as f:
+        if not event.is_directory and event.src_path.endswith("../commentary.txt"):
+            with open("../commentary.txt", "r") as f:
                 text = f.read()
             new_text = text.replace(self.last_text, "")
             if new_text:
@@ -63,6 +63,20 @@ def play_audios():
             os.remove(wav_file)  # Delete the .wav file after playing it
         else:
             time.sleep(1)  # Wait for 1 second if the queue is empty
+
+
+# def play_audios():
+#     while True:
+#         if not audio_queue.empty():
+#             audio_file = audio_queue.get()
+#             audio = AudioSegment.from_mp3(audio_file)
+#             wav_file = "temp.wav"  # Temporary .wav file
+#             audio.export(wav_file, format="wav")  # Convert to .wav format
+#             st.audio(wav_file, format='audio/wav')
+#             os.remove(audio_file)  # Delete the .mp3 file after playing it
+#             os.remove(wav_file)  # Delete the .wav file after playing it
+#         else:
+#             time.sleep(1)  # Wait for 1 second if the queue is empty
 
 
 # Create an observer and register the handler
