@@ -11,6 +11,7 @@
   - [User Interface](#user-interface)
 - [Accessibility and Inclusion](#accessibility-and-inclusion)
 - [Future Enhancements](#future-enhancements)
+- [For Developers](#for-developers)
 - [Conclusion](#conclusion)
 
 ## Technical Overview
@@ -56,7 +57,9 @@ Our commitment to innovation drives us to explore future enhancements:
 
 To run
 
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
 
 Start the Text to Speech service
 
