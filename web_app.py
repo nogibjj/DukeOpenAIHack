@@ -25,8 +25,8 @@ generated_text_placeholder = st.empty()
 
 # Store the last modification time
 if 'last_update' not in st.session_state:
-    if os.path.exists('commentary.txt'):
-        st.session_state['last_update'] = os.path.getmtime('commentary.txt')
+    if os.path.exists('src/commentary.txt'):
+        st.session_state['last_update'] = os.path.getmtime('src/commentary.txt')
     else:
         st.session_state['last_update'] = None
 
@@ -36,9 +36,9 @@ if 'lines' not in st.session_state:
 
 while True:
     # Check if the file has been updated
-    current_update = os.path.getmtime('commentary.txt')
+    current_update = os.path.getmtime('src/commentary.txt')
     if current_update != st.session_state['last_update']:
-        with open('commentary.txt', 'r') as file:
+        with open('src/commentary.txt', 'r') as file:
             st.session_state['lines'] = file.readlines()
         st.session_state['last_update'] = current_update
 

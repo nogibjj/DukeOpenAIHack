@@ -1,87 +1,85 @@
-# DUKE GENERATIVE AI HACKATHON
 # NBA Live Commentary Generator with GPT-4.0
 
+![Project Architecture](arch.png)
+
 ## Table of Contents
-
-
----------- OPTIONAL -------------
-- [Demo](#demo)   - need to add a video or smth
-- [Overview](#Overview)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
+- [Demo](https://youtu.be/ZzF3iewrsoo)
+- [Technical Overview](#technical-overview)
   - [API Integration](#api-integration)
-  - [Running the Commentary Generator](#running-the-commentary-generator)
-- [Contributing](#contributing)
-- [License](#license)
+  - [Data Management](#data-management)
+  - [Audio Integration](#audio-integration)
+  - [User Interface](#user-interface)
+- [Accessibility and Inclusion](#accessibility-and-inclusion)
+- [Future Enhancements](#future-enhancements)
+- [Conclusion](#conclusion)
 
+## Technical Overview
+The NBA Live Commentary Generator is an innovative project that combines real-time data, advanced language generation, and API integration to offer dynamic commentary during NBA games. Here's a deep dive into the technical aspects of this groundbreaking solution:
 
+### API Integration
+- **NBA Stats API:** We leverage the NBA Stats API to access live play-by-play data, player statistics, and season/career insights. This API forms the backbone of our data-driven commentary, enabling us to provide up-to-the-minute analysis and real-time insights about players.
 
+- **SportRadar API:** Complementing the NBA Stats API, the SportRadar API furnishes additional sports-related data, including player biographies, team information, and historical statistics. This enriches our commentary, offering a comprehensive view of the game and the players involved.
 
+### Data Management
+- **Faiss Vector Database:** To manage context effectively, we use Faiss, a powerful vector database. Faiss helps us store and retrieve context information efficiently, ensuring our commentary remains relevant and insightful as the game unfolds.
 
-## Overview
+- **Langchain:** Langchain technology is integrated into our project to persist contextual data and chain together current and past events' context to enhance the responses.
 
-In the era of data-driven sports analysis and immersive fan experiences, our project aims to create an innovative solution that combines play-by-play data from the SportsRadar API and NBA API with the advanced language generation capabilities of GPT-4.0 from OpenAI. This collaboration results in a live commentary generator for NBA games that goes beyond traditional commentary by offering real-time insights and engagement with fans.
+### Audio Integration
+- **Google Cloud API:** We utilize the Google Cloud speech-to-text service to convert the generated commentary into real-time audio, enhancing the fan experience by providing both text and speech commentary simultaneously.
 
-### Problem Statement
+### User Interface
+- **Streamlit:** Streamlit serves as the foundation of our user-friendly interface, displaying real-time commentary, statistics, and insights. This intuitive interface allows fans to engage with our commentary seamlessly.
 
-Traditional sports commentary can sometimes fall short of capturing the excitement and intricacies of live NBA games. Often, fans rely on commentary that lacks in-depth analysis, and there's room for improvement. Our project addresses this gap by providing live, dynamic, and insightful commentary for NBA games.
+## Accessibility and Inclusion
+Our project isn't just about technology; it's about accessibility and financial inclusion:
 
-### Key Features
+- **Accessibility for Fans with Disabilities:** Our real-time commentary makes NBA games more accessible to visually impaired fans by providing detailed play-by-play, statistics, and text-to-speech functionality for an immersive experience.
 
-- **Data Integration**: We retrieve real-time play-by-play data from the SportsRadar and NBA APIs, including details on player actions, scores, and game statistics.
-
-- **Language Generation**: We leverage the state-of-the-art GPT-4.0 model to transform raw data into coherent and engaging commentary. The model can provide context-aware insights, player statistics, historical comparisons, and even predict game outcomes based on the ongoing events.
-
-- **Real-time Updates**: Our system constantly updates commentary as the game progresses, providing fans with the most up-to-date information and reactions to in-game developments.
-
-- **Multimodal Experience**: In addition to textual commentary, we offer the option to convert the generated text into speech, creating a seamless and immersive experience for fans who prefer to listen to the commentary.
-
-- **Customization and Personalization**: Users can choose the level of analysis and detail in commentary, allowing for a tailored experience, whether they're casual fans or avid analysts.
-
-- **Cross-Platform Compatibility**: The system can be integrated with websites, mobile apps, or even smart speakers, making it accessible to fans on a variety of platforms.
-
-## Use Cases
-
-1. **Immersive Fan Experience**: Fans can access real-time commentary that goes beyond traditional play-by-play descriptions, making them feel more connected to the game.
-
-2. **Enhanced Data Analysis**: Analysts and coaches can use the system to gain deeper insights into team and player performance, including in-game strategy adjustments.
-
-3. **Educational Tool**: The commentary can serve as an educational resource for individuals interested in learning more about basketball and its strategies.
-
-4. **Content Generation**: Content creators can leverage the commentary to produce dynamic content, such as live blogs, podcasts, or video summaries.
-
-5. **Accessible Sports Commentary**: The text-to-speech feature ensures that commentary is accessible to individuals with visual impairments.
-
-## Technical Details
-
-- The project is implemented in Python, utilizing various libraries and APIs for data retrieval, processing, and text generation.
-
-- Data from the SportsRadar and NBA APIs is retrieved in real-time, and it's structured to feed into the GPT-4.0 model.
-
-- The OpenAI API is used to interact with GPT-4.0 for text generation.
-
-- Text-to-speech capabilities can be integrated using libraries like `gTTS` (Google Text-to-Speech) or cloud-based services.
-
-- User interfaces can be developed for different platforms based on project requirements.
+- **Bridging the Financial Gap:** We offer subsidized and flexible payment structures, making NBA games accessible to fans who can't afford subscriptions or in-person attendance.
 
 ## Future Enhancements
+Our commitment to innovation drives us to explore future enhancements:
 
-- **Multilingual Support**: Expanding commentary to support multiple languages to reach a broader audience.
+- **Multilingual Support:** We plan to expand commentary to support multiple languages to reach a broader audience.
 
-- **User Preferences**: Allowing users to customize the commentary, such as choosing their favorite team or player to focus on.
+- **User Preferences:** Allowing users to customize the commentary, such as choosing their favorite team or player to focus on, tailoring their experience.
 
-- **Predictive Analysis**: Implementing more advanced algorithms to provide predictions and game insights based on historical data and current game dynamics.
+- **Predictive Analysis:** Implementing more advanced algorithms to provide predictions and game insights based on historical data and current game dynamics.
 
-- **Integration with Smart Devices**: Developing applications for smart speakers and other voice-controlled devices to provide a hands-free experience for users.
+- **Integration with Smart Devices:** Developing applications for smart speakers and other voice-controlled devices to provide a hands-free experience for users.
 
-- **Real-time Visualizations**: Incorporating real-time graphs and visualizations to supplement the commentary.
+- **Real-time Visualizations:** Incorporating real-time graphs and visualizations to supplement the commentary.
+
+## For Developers
+
+To run
+
+```pip install -r requirements.txt```
+
+Start the Text to Speech service
+
+```
+cd src
+python tts.py
+```
+
+Run Streamlit App
+
+```
+cd ..
+streamlit run web_app.py
+```
+
+Run commentary generation
+
+```
+#check for API keys and all configuration for APIs
+cd src
+python generator.py
+```
 
 ## Conclusion
-
-Our NBA Live Commentary Generator with GPT-4.0 project aims to revolutionize the way fans experience NBA games. By combining the power of real-time data with cutting-edge language generation, we offer a more engaging, insightful, and personalized experience for fans, analysts, and content creators. With a commitment to continuous improvement and innovation, we hope to enhance the world of sports commentary and analysis.
-
-Feel free to adapt and expand upon this detailed overview to create a comprehensive and engaging description of your project for the hackathon.
-
+The NBA Live Commentary Generator is a groundbreaking project that enhances the fan experience with real-time, dynamic commentary. With robust API integration, advanced data management, audio integration, and a user-friendly interface, we offer a comprehensive solution. Accessibility and future enhancements are integral to our mission, making sports commentary more inclusive and dynamic. Join us in this exciting journey of transforming sports commentary with our NBA Live Commentary Generator powered by GPT-4.0!
 
