@@ -90,8 +90,7 @@ def current_game_event(curr_event):
 # Function to retrieve the last n responses from the vector store
 def get_context_from_vector_store(curr_game_play_data):
     # Get the last n responses from the vector store
-    #context = db.similarity_search(curr_game_play_data)
-    context = main_db.as_retriever(curr_game_play_data, search_type="similarity_score_threshold", search_kwargs={"score_threshold": .8, "k": 10})
+    context = main_db.similarity_search(curr_game_play_data)
     return context
 
 
