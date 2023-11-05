@@ -99,7 +99,7 @@ def generate_commentary(curr_gameplay, curr_context):
     curr_context = get_context_from_vector_store(curr_gameplay)
 
     curr_response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
@@ -138,7 +138,7 @@ def main():
         output_file.write(f"{intro}")
 
     n = 2
-    while n < 5:
+    while n < 10:
         event = data[n]
         curr_event = current_game_event(event)
 
