@@ -12,6 +12,24 @@ import winsound
 audio_queue = queue.Queue()
 
 
+# def text_to_speech(text, filename):
+#     client = texttospeech.TextToSpeechClient()
+
+#     input_text = texttospeech.SynthesisInput(text=text)
+
+#     voice = texttospeech.VoiceSelectionParams(
+#         language_code="en-US",
+#         ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
+#     )
+
+#     audio_config = texttospeech.AudioConfig(
+#         audio_encoding=texttospeech.AudioEncoding.MP3
+#     )
+
+#     response = client.synthesize_speech(
+#         request={"input": input_text, "voice": voice, "audio_config": audio_config}
+#     )
+
 def text_to_speech(text, filename):
     client = texttospeech.TextToSpeechClient()
 
@@ -19,11 +37,14 @@ def text_to_speech(text, filename):
 
     voice = texttospeech.VoiceSelectionParams(
         language_code="en-US",
-        ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
+        name="en-US-Polyglot-1",
     )
 
+
     audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        pitch=-4.4,
+        speaking_rate=1.27,
     )
 
     response = client.synthesize_speech(
@@ -40,7 +61,7 @@ class TextFileChangeHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         if not event.is_directory and event.src_path.endswith("commentary.txt"):
-            with open("../commentary.txt", "r") as f:
+            with open("commentary.txt", "r") as f:
                 text = f.read()
             new_text = text.replace(self.last_text, "")
             if new_text:
@@ -51,19 +72,6 @@ class TextFileChangeHandler(FileSystemEventHandler):
                 self.last_text = text
 
 
-# def play_audios():
-#     while True:
-#         if not audio_queue.empty():
-#             audio_file = audio_queue.get()
-#             audio = AudioSegment.from_mp3(audio_file)
-#             wav_file = "temp.wav"  # Temporary .wav file
-#             audio.export(wav_file, format="wav")  # Convert to .wav format
-#             winsound.PlaySound(wav_file, winsound.SND_FILENAME)
-#             os.remove(audio_file)  # Delete the .mp3 file after playing it
-#             os.remove(wav_file)  # Delete the .wav file after playing it
-#         else:
-#             time.sleep(1)  # Wait for 1 second if the queue is empty
-
 def play_audios():
     while True:
         if not audio_queue.empty():
@@ -71,11 +79,11 @@ def play_audios():
             audio = AudioSegment.from_mp3(audio_file)
             wav_file = "temp.wav"  # Temporary .wav file
             audio.export(wav_file, format="wav")  # Convert to .wav format
-            st.audio(wav_file, format='audio/wav')
+            winsound.PlaySound(wav_file, winsound.SND_FILENAME)
             os.remove(audio_file)  # Delete the .mp3 file after playing it
             os.remove(wav_file)  # Delete the .wav file after playing it
         else:
-            time.sleep(1)  # Wait for 1 second if the queue is empty
+            time.sleep(2)  # Wait for 1 second if the queue is empty
 
 
 # Create an observer and register the handler
