@@ -124,12 +124,11 @@ def main():
     while n < 20:
 
         event = data[n]
-        start =time.time()
         curr_event = current_game_event(event)
 
         context = get_context_from_vector_store(curr_event)
         curr_commentary = generate_commentary(curr_event, context)
-        stop =time.time()
+
         #add it to vector store 
         add_to_vector_store(curr_commentary)
 
