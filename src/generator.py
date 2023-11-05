@@ -20,7 +20,7 @@ openai.api_key = api_key
 embeddings = OpenAIEmbeddings(openai_api_key=api_key)
 
 # Load pregame information and add it to FAISS
-loader = TextLoader("../data/pregame_info.txt")
+loader = TextLoader("../data/pregame_info.txt", encoding="utf-8")
 documents = loader.load()
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
@@ -66,11 +66,23 @@ def generate_game_intro(db):
 
 # print(generate_game_intro(intro_db))
 # get current line in game play json
+# def get_current_game_play():
+#     with open("../data/play_by_play.json", "r") as data_file:
+#         for line in data_file:
+#             game_play_data = json.loads(line)
+#             return game_play_data
+
+
 def get_current_game_play():
     with open("../data/play_by_play.json", "r") as data_file:
         for line in data_file:
-            game_play_data = json.loads(line)
-            return game_play_data
+            line = line.strip()  # Remove leading/trailing whitespace
+            if line:  # Skip empty lines
+                try:
+                    game_play_data = json.loads(line)
+                    return game_play_data
+                except json.JSONDecodeError:
+                    continue  # Skip lines that are not valid JSON
 
 
 def current_game_event(curr_event):
