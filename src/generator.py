@@ -147,14 +147,9 @@ def main():
 
         # add it to vector store
         add_to_vector_store(curr_commentary)
-        print(curr_commentary)
         # print (new_commentary)
         with open("commentary.txt", "a") as output_file:
             output_file.write(f"{curr_commentary}\n")
-
-
-        # average lag time
-        print(n)
         n += 1
     return None
 
