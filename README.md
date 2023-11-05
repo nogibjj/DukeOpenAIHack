@@ -1,5 +1,6 @@
 # NBA Live Commentary Generator with GPT-4.0
 
+
 ## Table of Contents
 - [Demo](https://youtu.be/ZzF3iewrsoo)
 - [Technical Overview](#technical-overview)
@@ -50,7 +51,34 @@ Our commitment to innovation drives us to explore future enhancements:
 
 - **Real-time Visualizations:** Incorporating real-time graphs and visualizations to supplement the commentary.
 
+## For Developers
+
+To run
+
+```pip install -r requirements.txt```
+
+Start the Text to Speech service
+
+```
+cd src
+python tts.py
+```
+
+Run Streamlit App
+
+```
+cd ..
+streamlit run web_app.py
+```
+
+Run commentary generation
+
+```
+#check for API keys and all configuration for APIs
+cd src
+python generator.py
+```
+
 ## Conclusion
 The NBA Live Commentary Generator is a groundbreaking project that enhances the fan experience with real-time, dynamic commentary. With robust API integration, advanced data management, audio integration, and a user-friendly interface, we offer a comprehensive solution. Accessibility and future enhancements are integral to our mission, making sports commentary more inclusive and dynamic. Join us in this exciting journey of transforming sports commentary with our NBA Live Commentary Generator powered by GPT-4.0!
 
-[GitHub Repository](https://github.com/your-repo-link)
