@@ -1,5 +1,6 @@
 # NBA Live Commentary Generator with GPT-4.0
 
+![Project Architecture](arch.png)
 
 ## Table of Contents
 - [Demo](https://youtu.be/ZzF3iewrsoo)
