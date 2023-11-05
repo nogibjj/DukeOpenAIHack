@@ -20,7 +20,7 @@ openai.api_key = api_key
 embeddings = OpenAIEmbeddings(openai_api_key=api_key)
 
 # Load pregame information and add it to FAISS
-loader = TextLoader("../data/pregame.txt")
+loader = TextLoader("../data/pregame_info.txt")
 documents = loader.load()
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
@@ -41,7 +41,7 @@ def generate_game_intro(db):
     retriever = db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .8, "k": 10})
 
     prompt = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
@@ -117,7 +117,7 @@ def main():
     data = get_current_game_play()
 
     intro = generate_game_intro(intro_db)
-    with open("../data/output.txt", "a") as output_file:
+    with open("../commentary.txt", "a") as output_file:
         output_file.write(f"{intro}")
 
     n = 2
@@ -134,7 +134,7 @@ def main():
         add_to_vector_store(curr_commentary)
 
         #print (new_commentary)
-        with open("../data/output.txt", "a") as output_file:
+        with open("../commentary.txt", "a") as output_file:
             output_file.write(f"{curr_commentary}\n")
         
         #average lag time
