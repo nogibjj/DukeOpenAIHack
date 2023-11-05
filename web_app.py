@@ -20,9 +20,15 @@ st.audio(audio_bytes, format='audio/mp3')
 # Placeholder for the generated text
 generated_text_placeholder = st.empty()
 
+
+
+
 # Store the last modification time
 if 'last_update' not in st.session_state:
-    st.session_state['last_update'] = os.path.getmtime('commentary.txt')
+    if os.path.exists('commentary.txt'):
+        st.session_state['last_update'] = os.path.getmtime('commentary.txt')
+    else:
+        st.session_state['last_update'] = None
 
 # Store the lines of text
 if 'lines' not in st.session_state:
